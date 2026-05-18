@@ -8,558 +8,121 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap');
-
   :root {
-    --ink: #0a0a0a;
-    --paper: #f5f2eb;
-    --accent: #d4522a;
-    --accent2: #2a6dd4;
-    --muted: #8a8070;
-    --border: #d8d0c0;
-    --card: #ffffff;
-    --highlight: #fff8e7;
+    --ink: #0a0a0a; --paper: #f5f2eb; --accent: #d4522a; --accent2: #2a6dd4;
+    --muted: #8a8070; --border: #d8d0c0; --card: #ffffff; --highlight: #fff8e7;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Mono', monospace;
-    background: var(--paper);
-    color: var(--ink);
-    min-height: 100vh;
-  }
-
-  /* HEADER */
+  body { font-family: 'DM Mono', monospace; background: var(--paper); color: var(--ink); min-height: 100vh; }
   header {
-    padding: 28px 40px 24px;
-    border-bottom: 2px solid var(--ink);
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    background: var(--ink);
-    color: var(--paper);
+    padding: 28px 40px 24px; border-bottom: 2px solid var(--ink);
+    display: flex; align-items: flex-end; justify-content: space-between;
+    background: var(--ink); color: var(--paper);
   }
+  .header-left h1 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
+  .header-left p { font-size: 11px; color: #888; margin-top: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .header-badge { font-size: 10px; font-weight: 500; padding: 5px 12px; border: 1px solid #444; border-radius: 2px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
 
-  .header-left h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    line-height: 1;
+  /* API KEY SETUP */
+  .setup-screen { max-width: 560px; margin: 60px auto; }
+  .setup-card { background: var(--card); border: 2px solid var(--ink); border-radius: 4px; overflow: hidden; }
+  .setup-header { background: var(--ink); color: var(--paper); padding: 20px 24px; }
+  .setup-header h2 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .setup-header p { font-size: 11px; color: #888; }
+  .setup-body { padding: 24px; }
+  .setup-body label { display: block; font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .setup-body input {
+    width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 2px;
+    font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); background: var(--paper);
+    margin-bottom: 12px; outline: none; transition: border-color 0.2s;
   }
-
-  .header-left p {
-    font-size: 11px;
-    color: #888;
-    margin-top: 6px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  .setup-body input:focus { border-color: var(--accent); }
+  .setup-note { font-size: 11px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; padding: 10px 12px; background: var(--highlight); border: 1px solid var(--border); border-radius: 2px; }
+  .setup-note a { color: var(--accent2); text-decoration: none; }
+  .setup-btn {
+    width: 100%; padding: 14px; background: var(--ink); color: var(--paper); border: none;
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; text-transform: uppercase; border-radius: 2px; transition: background 0.2s;
   }
+  .setup-btn:hover { background: var(--accent); }
+  .setup-error { font-size: 11px; color: #c53030; margin-top: 8px; display: none; }
 
-  .header-badge {
-    font-size: 10px;
-    font-weight: 500;
-    padding: 5px 12px;
-    border: 1px solid #444;
-    border-radius: 2px;
-    color: var(--accent);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+  /* MAIN APP */
+  .app-screen { display: none; }
+  .api-status { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; margin-bottom: 24px; }
+  .api-dot { width: 7px; height: 7px; border-radius: 50%; background: #48bb78; }
+  .change-key-btn { font-size: 11px; color: var(--accent); background: none; border: none; cursor: pointer; font-family: 'DM Mono', monospace; text-decoration: underline; margin-left: auto; }
 
-  /* MAIN LAYOUT */
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 40px 24px;
-  }
-
-  /* UPLOAD ZONE */
-  .upload-section {
-    margin-bottom: 32px;
-  }
-
-  .section-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: 4px;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--card);
-    position: relative;
-  }
-
-  .upload-zone:hover, .upload-zone.dragover {
-    border-color: var(--accent);
-    background: var(--highlight);
-  }
-
-  .upload-zone input {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-  }
-
-  .upload-icon {
-    font-size: 32px;
-    margin-bottom: 12px;
-  }
-
-  .upload-zone h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  .upload-zone p {
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  /* SAMPLES */
-  .samples-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 16px;
-  }
-
-  .sample-btn {
-    padding: 6px 14px;
-    border: 1.5px solid var(--border);
-    background: var(--card);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: var(--ink);
-    border-radius: 2px;
-  }
-
-  .sample-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--highlight);
-  }
-
-  .sample-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
-  }
-
-  /* DATA PREVIEW */
-  .data-preview {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 24px;
-  }
-
-  .preview-header {
-    padding: 12px 16px;
-    border-bottom: 1.5px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--ink);
-    color: var(--paper);
-  }
-
-  .preview-header span {
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-
-  .preview-header .stats {
-    font-size: 11px;
-    color: #888;
-  }
-
-  .preview-table-wrap {
-    overflow-x: auto;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-  }
-
-  th {
-    padding: 8px 12px;
-    text-align: left;
-    background: #f7f4ef;
-    border-bottom: 1.5px solid var(--border);
-    font-weight: 600;
-    white-space: nowrap;
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.5px;
-  }
-
-  td {
-    padding: 7px 12px;
-    border-bottom: 1px solid #eee;
-    white-space: nowrap;
-  }
-
+  .section-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .upload-zone { border: 2px dashed var(--border); border-radius: 4px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--card); position: relative; }
+  .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: var(--highlight); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { font-size: 32px; margin-bottom: 12px; }
+  .upload-zone h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .upload-zone p { font-size: 12px; color: var(--muted); }
+  .samples-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .sample-btn { padding: 6px 14px; border: 1.5px solid var(--border); background: var(--card); font-family: 'DM Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.2s; color: var(--ink); border-radius: 2px; }
+  .sample-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--highlight); }
+  .sample-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .data-preview { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 24px; }
+  .preview-header { padding: 12px 16px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--ink); color: var(--paper); }
+  .preview-header span { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 500; }
+  .preview-header .stats { font-size: 11px; color: #888; }
+  .preview-table-wrap { overflow-x: auto; max-height: 200px; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { padding: 8px 12px; text-align: left; background: #f7f4ef; border-bottom: 1.5px solid var(--border); font-weight: 600; white-space: nowrap; font-family: 'Syne', sans-serif; font-size: 11px; letter-spacing: 0.5px; }
+  td { padding: 7px 12px; border-bottom: 1px solid #eee; white-space: nowrap; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: var(--highlight); }
-
-  /* ANALYZE BUTTON */
-  .analyze-btn {
-    width: 100%;
-    padding: 16px;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.2s;
-    border-radius: 2px;
-    margin-bottom: 24px;
-  }
-
+  .analyze-btn { width: 100%; padding: 16px; background: var(--ink); color: var(--paper); border: none; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; border-radius: 2px; margin-bottom: 24px; }
   .analyze-btn:hover { background: var(--accent); }
   .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* LOADING */
-  .loading {
-    display: none;
-    text-align: center;
-    padding: 48px;
-  }
-
-  .loading-bar {
-    width: 200px;
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    margin: 16px auto 0;
-    overflow: hidden;
-  }
-
-  .loading-bar-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    animation: loadbar 1.5s ease-in-out infinite;
-  }
-
-  @keyframes loadbar {
-    0% { width: 0%; margin-left: 0; }
-    50% { width: 60%; margin-left: 20%; }
-    100% { width: 0%; margin-left: 100%; }
-  }
-
-  .loading p {
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  /* RESULTS */
+  .loading { display: none; text-align: center; padding: 48px; }
+  .loading-bar { width: 200px; height: 3px; background: var(--border); border-radius: 2px; margin: 16px auto 0; overflow: hidden; }
+  .loading-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; animation: loadbar 1.5s ease-in-out infinite; }
+  @keyframes loadbar { 0% { width: 0%; margin-left: 0; } 50% { width: 60%; margin-left: 20%; } 100% { width: 0%; margin-left: 100%; } }
+  .loading p { font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
   .results { display: none; }
-
-  .results-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 24px;
-  }
-
-  .insight-card {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .insight-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; }
   .insight-card.full { grid-column: 1 / -1; }
-
-  .card-header {
-    padding: 12px 16px;
-    border-bottom: 1.5px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--paper);
-  }
-
-  .card-header h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .card-num {
-    font-size: 10px;
-    color: var(--muted);
-    margin-left: auto;
-  }
-
+  .card-header { padding: 12px 16px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; gap: 8px; background: var(--paper); }
+  .card-header h3 { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .card-num { font-size: 10px; color: var(--muted); margin-left: auto; }
   .card-body { padding: 20px; }
-
-  /* SUMMARY */
-  .summary-text {
-    font-size: 13px;
-    line-height: 1.8;
-    color: var(--ink);
-  }
-
-  .summary-text strong {
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  /* KEY FINDINGS */
+  .summary-text { font-size: 13px; line-height: 1.8; color: var(--ink); }
+  .summary-text strong { color: var(--accent); font-weight: 500; }
   .finding-list { list-style: none; }
-
-  .finding-list li {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-    line-height: 1.6;
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-
+  .finding-list li { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; line-height: 1.6; display: flex; gap: 10px; align-items: flex-start; }
   .finding-list li:last-child { border-bottom: none; }
-
-  .finding-num {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 14px;
-    color: var(--accent);
-    min-width: 20px;
-    line-height: 1.4;
-  }
-
-  /* CHART */
-  .chart-wrap {
-    position: relative;
-    height: 220px;
-  }
-
-  /* CHART SELECTOR */
-  .chart-selector {
-    display: flex;
-    gap: 6px;
-    padding: 12px 16px;
-    border-bottom: 1.5px solid var(--border);
-    background: var(--paper);
-  }
-
-  .chart-type-btn {
-    padding: 4px 10px;
-    border: 1.5px solid var(--border);
-    background: white;
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    cursor: pointer;
-    border-radius: 2px;
-    color: var(--muted);
-    transition: all 0.15s;
-  }
-
-  .chart-type-btn.active {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: white;
-  }
-
-  /* RECOMMENDATIONS */
+  .finding-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px; color: var(--accent); min-width: 20px; line-height: 1.4; }
+  .chart-wrap { position: relative; height: 220px; }
+  .chart-selector { display: flex; gap: 6px; padding: 12px 16px; border-bottom: 1.5px solid var(--border); background: var(--paper); }
+  .chart-type-btn { padding: 4px 10px; border: 1.5px solid var(--border); background: white; font-family: 'DM Mono', monospace; font-size: 10px; cursor: pointer; border-radius: 2px; color: var(--muted); transition: all 0.15s; }
+  .chart-type-btn.active { background: var(--ink); border-color: var(--ink); color: white; }
   .rec-list { list-style: none; }
-
-  .rec-list li {
-    padding: 10px 0 10px 20px;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-    line-height: 1.6;
-    position: relative;
-  }
-
+  .rec-list li { padding: 10px 0 10px 20px; border-bottom: 1px solid var(--border); font-size: 12px; line-height: 1.6; position: relative; }
   .rec-list li:last-child { border-bottom: none; }
-  .rec-list li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent2);
-    font-weight: 700;
-  }
-
-  /* FOLLOW-UP */
-  .followup-section {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 24px;
-  }
-
-  .followup-header {
-    padding: 12px 16px;
-    border-bottom: 1.5px solid var(--border);
-    background: var(--ink);
-    color: var(--paper);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .followup-header h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .chat-messages {
-    max-height: 240px;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .msg {
-    max-width: 85%;
-    padding: 10px 14px;
-    font-size: 12px;
-    line-height: 1.6;
-    border-radius: 2px;
-  }
-
-  .msg.user {
-    background: var(--ink);
-    color: var(--paper);
-    align-self: flex-end;
-    border-radius: 2px 2px 0 2px;
-  }
-
-  .msg.assistant {
-    background: var(--highlight);
-    border: 1px solid var(--border);
-    align-self: flex-start;
-    border-radius: 2px 2px 2px 0;
-  }
-
-  .msg.loading-msg {
-    background: var(--highlight);
-    border: 1px solid var(--border);
-    align-self: flex-start;
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  .followup-input {
-    display: flex;
-    border-top: 1.5px solid var(--border);
-  }
-
-  .followup-input input {
-    flex: 1;
-    padding: 12px 16px;
-    border: none;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    background: var(--paper);
-    color: var(--ink);
-    outline: none;
-  }
-
-  .followup-input button {
-    padding: 12px 20px;
-    background: var(--accent);
-    border: none;
-    color: white;
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: background 0.2s;
-  }
-
+  .rec-list li::before { content: '→'; position: absolute; left: 0; color: var(--accent2); font-weight: 700; }
+  .followup-section { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 24px; }
+  .followup-header { padding: 12px 16px; border-bottom: 1.5px solid var(--border); background: var(--ink); color: var(--paper); display: flex; align-items: center; gap: 8px; }
+  .followup-header h3 { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .chat-messages { max-height: 240px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 85%; padding: 10px 14px; font-size: 12px; line-height: 1.6; border-radius: 2px; }
+  .msg.user { background: var(--ink); color: var(--paper); align-self: flex-end; border-radius: 2px 2px 0 2px; }
+  .msg.assistant { background: var(--highlight); border: 1px solid var(--border); align-self: flex-start; border-radius: 2px 2px 2px 0; }
+  .msg.loading-msg { background: var(--highlight); border: 1px solid var(--border); align-self: flex-start; color: var(--muted); font-style: italic; }
+  .followup-input { display: flex; border-top: 1.5px solid var(--border); }
+  .followup-input input { flex: 1; padding: 12px 16px; border: none; font-family: 'DM Mono', monospace; font-size: 12px; background: var(--paper); color: var(--ink); outline: none; }
+  .followup-input button { padding: 12px 20px; background: var(--accent); border: none; color: white; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: background 0.2s; }
   .followup-input button:hover { background: var(--ink); }
-
-  /* RESET */
-  .reset-btn {
-    width: 100%;
-    padding: 10px;
-    background: transparent;
-    border: 1.5px solid var(--border);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    cursor: pointer;
-    color: var(--muted);
-    border-radius: 2px;
-    margin-bottom: 24px;
-    transition: all 0.2s;
-  }
-
+  .reset-btn { width: 100%; padding: 10px; background: transparent; border: 1.5px solid var(--border); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; color: var(--muted); border-radius: 2px; margin-bottom: 24px; transition: all 0.2s; }
   .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  .error-box {
-    display: none;
-    background: #fff5f5;
-    border: 1.5px solid #f56565;
-    padding: 12px 16px;
-    font-size: 12px;
-    color: #c53030;
-    border-radius: 2px;
-    margin-bottom: 16px;
-  }
-
-  footer {
-    text-align: center;
-    padding: 24px;
-    font-size: 11px;
-    color: var(--muted);
-    border-top: 1px solid var(--border);
-    letter-spacing: 0.5px;
-  }
-
+  .error-box { display: none; background: #fff5f5; border: 1.5px solid #f56565; padding: 12px 16px; font-size: 12px; color: #c53030; border-radius: 2px; margin-bottom: 16px; }
+  footer { text-align: center; padding: 24px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); letter-spacing: 0.5px; }
   footer span { color: var(--accent); }
-
-  @media(max-width:700px) {
-    .results-grid { grid-template-columns: 1fr; }
-    .insight-card.full { grid-column: 1; }
-    header { padding: 20px; }
-    .container { padding: 24px 16px; }
-  }
+  @media(max-width:700px) { .results-grid { grid-template-columns: 1fr; } .insight-card.full { grid-column: 1; } header { padding: 20px; } .container { padding: 24px 16px; } }
 </style>
 </head>
 <body>
@@ -574,211 +137,161 @@
 
 <div class="container">
 
-  <!-- INPUT SECTION -->
-  <div id="input-section">
-    <div class="upload-section">
-      <div class="section-label">01 — Load Your Data</div>
-      <div class="upload-zone" id="upload-zone">
-        <input type="file" id="file-input" accept=".csv">
-        <div class="upload-icon">📂</div>
-        <h3>Drop a CSV file here or click to browse</h3>
-        <p>Supports any CSV with headers — sales, survey data, HR metrics, research data</p>
+  <!-- SETUP SCREEN -->
+  <div class="setup-screen" id="setup-screen">
+    <div class="setup-card">
+      <div class="setup-header">
+        <h2>Enter your Anthropic API Key</h2>
+        <p>Your key is stored only in this browser session — never saved or shared</p>
       </div>
-      <div class="section-label" style="margin-top:16px;">— or try a sample dataset —</div>
-      <div class="samples-row">
-        <button class="sample-btn" onclick="loadSample('sales')">📈 Sales Data</button>
-        <button class="sample-btn" onclick="loadSample('hr')">👥 HR Metrics</button>
-        <button class="sample-btn" onclick="loadSample('health')">🏥 Patient Survey</button>
-        <button class="sample-btn" onclick="loadSample('survey')">📋 Customer Survey</button>
-      </div>
-    </div>
-
-    <div id="preview-section" style="display:none">
-      <div class="section-label">02 — Preview</div>
-      <div class="data-preview">
-        <div class="preview-header">
-          <span id="filename-label">data.csv</span>
-          <span class="stats" id="data-stats"></span>
+      <div class="setup-body">
+        <label>Anthropic API Key</label>
+        <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off">
+        <div class="setup-note">
+          Your key stays in memory only and is cleared when you close the tab. 
+          Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
         </div>
-        <div class="preview-table-wrap">
-          <table id="preview-table"></table>
-        </div>
+        <button class="setup-btn" onclick="submitKey()">Start Analyzing →</button>
+        <div class="setup-error" id="setup-error">Invalid key — please check and try again.</div>
       </div>
-      <div class="error-box" id="error-box"></div>
-      <button class="analyze-btn" id="analyze-btn" onclick="analyze()">Analyze with Claude AI →</button>
     </div>
   </div>
 
-  <!-- LOADING -->
-  <div class="loading" id="loading">
-    <p>Analyzing your data...</p>
-    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
-  </div>
+  <!-- MAIN APP -->
+  <div class="app-screen" id="app-screen">
+    <div class="api-status">
+      <div class="api-dot"></div>
+      <span>Claude API connected</span>
+      <button class="change-key-btn" onclick="changeKey()">Change key</button>
+    </div>
 
-  <!-- RESULTS -->
-  <div class="results" id="results">
-    <button class="reset-btn" onclick="resetAll()">← Load Different Data</button>
-
-    <div class="results-grid">
-      <!-- SUMMARY -->
-      <div class="insight-card full">
-        <div class="card-header">
-          <span>📊</span>
-          <h3>Executive Summary</h3>
-          <span class="card-num" id="summary-meta"></span>
+    <div id="input-section">
+      <div style="margin-bottom:32px">
+        <div class="section-label">01 — Load Your Data</div>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="file-input" accept=".csv">
+          <div class="upload-icon">📂</div>
+          <h3>Drop a CSV file here or click to browse</h3>
+          <p>Supports any CSV with headers — sales, survey data, HR metrics, research data</p>
         </div>
-        <div class="card-body">
-          <div class="summary-text" id="summary-text"></div>
+        <div class="section-label" style="margin-top:16px;">— or try a sample dataset —</div>
+        <div class="samples-row">
+          <button class="sample-btn" onclick="loadSample('sales',this)">📈 Sales Data</button>
+          <button class="sample-btn" onclick="loadSample('hr',this)">👥 HR Metrics</button>
+          <button class="sample-btn" onclick="loadSample('health',this)">🏥 Patient Survey</button>
+          <button class="sample-btn" onclick="loadSample('survey',this)">📋 Customer Survey</button>
         </div>
       </div>
 
-      <!-- KEY FINDINGS -->
-      <div class="insight-card">
-        <div class="card-header">
-          <span>🔍</span>
-          <h3>Key Findings</h3>
-        </div>
-        <div class="card-body">
-          <ul class="finding-list" id="findings-list"></ul>
-        </div>
-      </div>
-
-      <!-- CHART -->
-      <div class="insight-card">
-        <div class="card-header">
-          <span>📉</span>
-          <h3>Visualization</h3>
-        </div>
-        <div class="chart-selector" id="chart-selector"></div>
-        <div class="card-body">
-          <div class="chart-wrap">
-            <canvas id="main-chart"></canvas>
+      <div id="preview-section" style="display:none">
+        <div class="section-label">02 — Preview</div>
+        <div class="data-preview">
+          <div class="preview-header">
+            <span id="filename-label">data.csv</span>
+            <span class="stats" id="data-stats"></span>
           </div>
+          <div class="preview-table-wrap"><table id="preview-table"></table></div>
         </div>
-      </div>
-
-      <!-- RECOMMENDATIONS -->
-      <div class="insight-card full">
-        <div class="card-header">
-          <span>💡</span>
-          <h3>Recommendations</h3>
-        </div>
-        <div class="card-body">
-          <ul class="rec-list" id="recs-list"></ul>
-        </div>
+        <div class="error-box" id="error-box"></div>
+        <button class="analyze-btn" onclick="analyze()">Analyze with Claude AI →</button>
       </div>
     </div>
 
-    <!-- FOLLOW-UP Q&A -->
-    <div class="followup-section">
-      <div class="followup-header">
-        <span>💬</span>
-        <h3>Ask a Question About Your Data</h3>
-      </div>
-      <div class="chat-messages" id="chat-messages"></div>
-      <div class="followup-input">
-        <input type="text" id="followup-input" placeholder="e.g. Which region has the highest revenue? What's driving the trend?" onkeydown="if(event.key==='Enter')askFollowup()">
-        <button onclick="askFollowup()">Ask →</button>
-      </div>
+    <div class="loading" id="loading">
+      <p>Analyzing your data...</p>
+      <div class="loading-bar"><div class="loading-bar-fill"></div></div>
     </div>
 
+    <div class="results" id="results">
+      <button class="reset-btn" onclick="resetAll()">← Load Different Data</button>
+      <div class="results-grid">
+        <div class="insight-card full">
+          <div class="card-header"><span>📊</span><h3>Executive Summary</h3><span class="card-num" id="summary-meta"></span></div>
+          <div class="card-body"><div class="summary-text" id="summary-text"></div></div>
+        </div>
+        <div class="insight-card">
+          <div class="card-header"><span>🔍</span><h3>Key Findings</h3></div>
+          <div class="card-body"><ul class="finding-list" id="findings-list"></ul></div>
+        </div>
+        <div class="insight-card">
+          <div class="card-header"><span>📉</span><h3>Visualization</h3></div>
+          <div class="chart-selector" id="chart-selector"></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="main-chart"></canvas></div></div>
+        </div>
+        <div class="insight-card full">
+          <div class="card-header"><span>💡</span><h3>Recommendations</h3></div>
+          <div class="card-body"><ul class="rec-list" id="recs-list"></ul></div>
+        </div>
+      </div>
+      <div class="followup-section">
+        <div class="followup-header"><span>💬</span><h3>Ask a Question About Your Data</h3></div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="followup-input">
+          <input type="text" id="followup-input" placeholder="e.g. Which department has the highest turnover?" onkeydown="if(event.key==='Enter')askFollowup()">
+          <button onclick="askFollowup()">Ask →</button>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
-
 <footer>Built by <span>Diya Rasam</span> · Data Insights Analyzer · Powered by Claude AI</footer>
 
 <script>
-// ---- SAMPLE DATA ----
-const SAMPLES = {
-  sales: {
-    name: 'Q1-Q2 Sales Data',
-    csv: `Region,Product,Quarter,Revenue,Units,Target,Rep
-North,Widget A,Q1,42500,850,40000,Sarah
-South,Widget A,Q1,38200,764,40000,Marcus
-East,Widget B,Q1,55100,920,50000,Priya
-West,Widget B,Q1,61300,1020,55000,Jake
-North,Widget A,Q2,47800,956,45000,Sarah
-South,Widget A,Q2,35600,712,42000,Marcus
-East,Widget B,Q2,58900,982,55000,Priya
-West,Widget B,Q2,72100,1202,65000,Jake
-North,Widget C,Q1,28400,473,30000,Sarah
-South,Widget C,Q1,31200,520,28000,Marcus
-East,Widget C,Q2,44500,742,40000,Priya
-West,Widget C,Q2,39800,663,38000,Jake`
-  },
-  hr: {
-    name: 'HR Metrics 2025',
-    csv: `Department,Headcount,Avg_Tenure_Yrs,Turnover_Rate,Satisfaction_Score,Avg_Salary,Open_Roles
-Engineering,48,3.2,12,7.8,125000,6
-Marketing,22,2.8,18,7.1,85000,3
-Sales,35,2.1,28,6.4,72000,8
-Operations,29,4.5,8,8.2,78000,2
-HR,12,5.1,5,8.6,82000,1
-Finance,18,4.2,7,8.0,95000,2
-Customer Success,25,1.9,32,6.1,65000,7
-Product,15,3.6,10,8.4,115000,3`
-  },
-  health: {
-    name: 'Patient Satisfaction Survey',
-    csv: `Department,Avg_Wait_Min,Satisfaction_1to10,Would_Recommend,Staff_Rating,Cleanliness,Revisit_Intent,Complaints
-Emergency,42,6.2,68,7.1,8.4,72,24
-Primary Care,18,8.1,89,8.8,9.1,91,6
-Cardiology,25,8.6,92,9.2,9.0,95,3
-Oncology,30,7.9,84,9.4,8.8,88,5
-Pediatrics,15,9.1,96,9.6,9.3,97,2
-Orthopedics,35,7.4,78,8.1,8.6,82,11
-Neurology,28,8.0,86,8.9,8.9,89,4
-Radiology,20,7.8,82,8.3,9.2,85,7`
-  },
-  survey: {
-    name: 'Customer Feedback Survey',
-    csv: `Segment,NPS_Score,Ease_of_Use,Support_Rating,Value_Rating,Churn_Risk,Avg_Monthly_Spend,Feature_Requests
-Enterprise,72,8.1,8.9,7.8,Low,4200,12
-Mid-Market,58,7.6,7.4,7.2,Medium,1800,8
-Small Business,44,8.4,6.8,6.5,High,420,5
-Startup,61,9.1,7.2,8.3,Medium,280,15
-Non-Profit,68,7.9,8.6,9.1,Low,190,4
-Government,55,6.8,7.9,7.6,Low,3100,6
-Education,63,8.7,8.1,9.4,Low,750,9`
-  }
-};
-
+// ---- STATE ----
+let API_KEY = null;
 let parsedData = null;
 let currentChart = null;
 let chatHistory = [];
 let currentCSVText = '';
 
-// ---- FILE UPLOAD ----
+// ---- SAMPLES ----
+const SAMPLES = {
+  sales: { name: 'Q1-Q2 Sales Data', csv: `Region,Product,Quarter,Revenue,Units,Target,Rep\nNorth,Widget A,Q1,42500,850,40000,Sarah\nSouth,Widget A,Q1,38200,764,40000,Marcus\nEast,Widget B,Q1,55100,920,50000,Priya\nWest,Widget B,Q1,61300,1020,55000,Jake\nNorth,Widget A,Q2,47800,956,45000,Sarah\nSouth,Widget A,Q2,35600,712,42000,Marcus\nEast,Widget B,Q2,58900,982,55000,Priya\nWest,Widget B,Q2,72100,1202,65000,Jake\nNorth,Widget C,Q1,28400,473,30000,Sarah\nSouth,Widget C,Q1,31200,520,28000,Marcus\nEast,Widget C,Q2,44500,742,40000,Priya\nWest,Widget C,Q2,39800,663,38000,Jake` },
+  hr: { name: 'HR Metrics 2025', csv: `Department,Headcount,Avg_Tenure_Yrs,Turnover_Rate,Satisfaction_Score,Avg_Salary,Open_Roles\nEngineering,48,3.2,12,7.8,125000,6\nMarketing,22,2.8,18,7.1,85000,3\nSales,35,2.1,28,6.4,72000,8\nOperations,29,4.5,8,8.2,78000,2\nHR,12,5.1,5,8.6,82000,1\nFinance,18,4.2,7,8.0,95000,2\nCustomer Success,25,1.9,32,6.1,65000,7\nProduct,15,3.6,10,8.4,115000,3` },
+  health: { name: 'Patient Satisfaction Survey', csv: `Department,Avg_Wait_Min,Satisfaction_1to10,Would_Recommend,Staff_Rating,Cleanliness,Revisit_Intent,Complaints\nEmergency,42,6.2,68,7.1,8.4,72,24\nPrimary Care,18,8.1,89,8.8,9.1,91,6\nCardiology,25,8.6,92,9.2,9.0,95,3\nOncology,30,7.9,84,9.4,8.8,88,5\nPediatrics,15,9.1,96,9.6,9.3,97,2\nOrthopedics,35,7.4,78,8.1,8.6,82,11\nNeurology,28,8.0,86,8.9,8.9,89,4\nRadiology,20,7.8,82,8.3,9.2,85,7` },
+  survey: { name: 'Customer Feedback Survey', csv: `Segment,NPS_Score,Ease_of_Use,Support_Rating,Value_Rating,Churn_Risk,Avg_Monthly_Spend,Feature_Requests\nEnterprise,72,8.1,8.9,7.8,Low,4200,12\nMid-Market,58,7.6,7.4,7.2,Medium,1800,8\nSmall Business,44,8.4,6.8,6.5,High,420,5\nStartup,61,9.1,7.2,8.3,Medium,280,15\nNon-Profit,68,7.9,8.6,9.1,Low,190,4\nGovernment,55,6.8,7.9,7.6,Low,3100,6\nEducation,63,8.7,8.1,9.4,Low,750,9` }
+};
+
+// ---- API KEY ----
+function submitKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    document.getElementById('setup-error').style.display = 'block';
+    return;
+  }
+  API_KEY = key;
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+}
+
+function changeKey() {
+  API_KEY = null;
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('setup-error').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'block';
+  resetAll();
+}
+
+// ---- UPLOAD ----
 const uploadZone = document.getElementById('upload-zone');
 const fileInput = document.getElementById('file-input');
-
 uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
-});
-
-fileInput.addEventListener('change', e => {
-  if (e.target.files[0]) handleFile(e.target.files[0]);
-});
+uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
 function handleFile(file) {
   document.getElementById('filename-label').textContent = file.name;
   const reader = new FileReader();
-  reader.onload = e => {
-    currentCSVText = e.target.result;
-    parseAndPreview(currentCSVText);
-  };
+  reader.onload = e => { currentCSVText = e.target.result; parseAndPreview(currentCSVText); };
   reader.readAsText(file);
 }
 
-function loadSample(key) {
+function loadSample(key, btn) {
   document.querySelectorAll('.sample-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  btn.classList.add('active');
   const s = SAMPLES[key];
   currentCSVText = s.csv;
   document.getElementById('filename-label').textContent = s.name;
@@ -790,18 +303,31 @@ function parseAndPreview(csv) {
   parsedData = result;
   const rows = result.data;
   const headers = result.meta.fields;
-
   document.getElementById('data-stats').textContent = `${rows.length} rows · ${headers.length} columns`;
-
-  // Build table
   const table = document.getElementById('preview-table');
   const thead = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
-  const tbodyRows = rows.slice(0, 8).map(r =>
-    `<tr>${headers.map(h => `<td>${r[h] ?? ''}</td>`).join('')}</tr>`
-  ).join('');
+  const tbodyRows = rows.slice(0, 8).map(r => `<tr>${headers.map(h => `<td>${r[h] ?? ''}</td>`).join('')}</tr>`).join('');
   table.innerHTML = thead + `<tbody>${tbodyRows}</tbody>`;
-
   document.getElementById('preview-section').style.display = 'block';
+}
+
+// ---- API CALL ----
+async function callClaude(messages, system, maxTokens) {
+  const body = { model: 'claude-sonnet-4-20250514', max_tokens: maxTokens, messages };
+  if (system) body.system = system;
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-allow-browser': 'true'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+  const data = await resp.json();
+  return data.content.map(b => b.text || '').join('');
 }
 
 // ---- ANALYZE ----
@@ -809,196 +335,89 @@ async function analyze() {
   if (!parsedData) return;
   document.getElementById('input-section').style.display = 'none';
   document.getElementById('loading').style.display = 'block';
-
   const csvPreview = currentCSVText.split('\n').slice(0, 25).join('\n');
-  const prompt = `Analyze this CSV dataset and return ONLY valid JSON with no markdown:
-{
-  "summary": "3-4 sentence executive summary of the most important patterns and insights",
-  "datasetDescription": "brief description of what this data is about",
-  "rowCount": ${parsedData.data.length},
-  "columnCount": ${parsedData.meta.fields.length},
-  "findings": [
-    {"title": "Finding title", "detail": "2 sentence explanation with specific numbers from the data"}
-  ],
-  "chartSuggestions": [
-    {
-      "label": "Chart name",
-      "type": "bar|line|pie|doughnut",
-      "xField": "column name for x axis or labels",
-      "yField": "column name for y axis or values",
-      "title": "Chart title"
-    }
-  ],
-  "recommendations": ["Specific actionable recommendation 1", "Recommendation 2", "Recommendation 3", "Recommendation 4"]
-}
-
-Provide 3-5 findings and 2-3 chart suggestions. Use actual column names from the CSV.
-
-CSV Data:
-${csvPreview}`;
-
+  const prompt = `Analyze this CSV dataset and return ONLY valid JSON with no markdown:\n{"summary":"3-4 sentence executive summary","datasetDescription":"brief description","rowCount":${parsedData.data.length},"columnCount":${parsedData.meta.fields.length},"findings":[{"title":"Finding title","detail":"2 sentence explanation with specific numbers"}],"chartSuggestions":[{"label":"Chart name","type":"bar|line|pie|doughnut","xField":"column name","yField":"column name","title":"Chart title"}],"recommendations":["Recommendation 1","Recommendation 2","Recommendation 3","Recommendation 4"]}\nProvide 3-5 findings and 2-3 chart suggestions. Use actual column names.\nCSV Data:\n${csvPreview}`;
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-allow-browser': 'true' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const data = await resp.json();
-    const text = data.content.map(b => b.text || '').join('');
+    const text = await callClaude([{ role: 'user', content: prompt }], null, 1500);
     const result = JSON.parse(text.replace(/```json|```/g, '').trim());
+    chatHistory = [
+      { role: 'user', content: `Dataset:\n${currentCSVText.split('\n').slice(0,30).join('\n')}\n\nSummary: ${result.summary}` },
+      { role: 'assistant', content: 'I have analyzed your dataset and am ready to answer questions.' }
+    ];
     renderResults(result);
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('input-section').style.display = 'block';
-    showError('Analysis failed. Please try again.');
+    const box = document.getElementById('error-box');
+    box.textContent = 'Analysis failed. Check your API key has credits and try again.';
+    box.style.display = 'block';
     console.error(e);
   }
 }
 
-// ---- RENDER RESULTS ----
 function renderResults(d) {
   document.getElementById('loading').style.display = 'none';
-
   document.getElementById('summary-text').innerHTML = d.summary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   document.getElementById('summary-meta').textContent = `${d.rowCount} rows · ${d.columnCount} cols`;
-
-  document.getElementById('findings-list').innerHTML = d.findings.map((f, i) =>
-    `<li><span class="finding-num">${String(i+1).padStart(2,'0')}</span><div><strong style="font-family:'Syne',sans-serif;font-size:12px">${f.title}</strong><br>${f.detail}</div></li>`
-  ).join('');
-
+  document.getElementById('findings-list').innerHTML = d.findings.map((f,i) => `<li><span class="finding-num">${String(i+1).padStart(2,'0')}</span><div><strong style="font-family:'Syne',sans-serif;font-size:12px">${f.title}</strong><br>${f.detail}</div></li>`).join('');
   document.getElementById('recs-list').innerHTML = d.recommendations.map(r => `<li>${r}</li>`).join('');
-
-  // Chart selector
   const selector = document.getElementById('chart-selector');
-  selector.innerHTML = d.chartSuggestions.map((c, i) =>
-    `<button class="chart-type-btn ${i===0?'active':''}" onclick="renderChart(${i})" data-idx="${i}">${c.label}</button>`
-  ).join('');
-
+  selector.innerHTML = d.chartSuggestions.map((c,i) => `<button class="chart-type-btn ${i===0?'active':''}" onclick="renderChart(${i})">${c.label}</button>`).join('');
   window._chartSuggestions = d.chartSuggestions;
   renderChart(0);
-
-  // Chat context
-  chatHistory = [{ role: 'user', content: `Here is my dataset:\n${currentCSVText.split('\n').slice(0,30).join('\n')}\n\nSummary: ${d.summary}` },
-    { role: 'assistant', content: 'I have analyzed your dataset and am ready to answer questions about it.' }];
-
   document.getElementById('results').style.display = 'block';
 }
 
-// ---- CHART RENDERING ----
 function renderChart(idx) {
   document.querySelectorAll('.chart-type-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
-
-  const suggestion = window._chartSuggestions[idx];
+  const s = window._chartSuggestions[idx];
   const rows = parsedData.data;
-  const labels = rows.map(r => r[suggestion.xField] || '').filter(Boolean);
-  const rawVals = rows.map(r => r[suggestion.yField]);
-  const values = rawVals.map(v => parseFloat(String(v).replace(/[^0-9.-]/g,'')) || 0);
-
+  const labels = rows.map(r => r[s.xField] || '').filter(Boolean);
+  const values = rows.map(r => parseFloat(String(r[s.yField]).replace(/[^0-9.-]/g,'')) || 0);
   if (currentChart) { currentChart.destroy(); currentChart = null; }
-
   const ctx = document.getElementById('main-chart').getContext('2d');
   const colors = ['#d4522a','#2a6dd4','#2ab87a','#e8a020','#8b2ad4','#2ab8b8','#d42a8b','#6dd42a'];
-
-  const cfg = {
-    type: suggestion.type,
-    data: {
-      labels,
-      datasets: [{
-        label: suggestion.yField,
-        data: values,
-        backgroundColor: suggestion.type === 'line'
-          ? 'rgba(212,82,42,0.12)'
-          : labels.map((_,i) => colors[i % colors.length]),
-        borderColor: suggestion.type === 'line' ? '#d4522a' : colors,
-        borderWidth: suggestion.type === 'line' ? 2 : 1.5,
-        fill: suggestion.type === 'line',
-        tension: 0.4,
-        pointBackgroundColor: '#d4522a',
-        pointRadius: suggestion.type === 'line' ? 4 : 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: suggestion.type === 'pie' || suggestion.type === 'doughnut',
-          labels: { font: { family: 'DM Mono', size: 10 }, color: '#0a0a0a' }
-        },
-        tooltip: {
-          bodyFont: { family: 'DM Mono', size: 11 },
-          titleFont: { family: 'Syne', size: 12 }
-        }
-      },
-      scales: suggestion.type === 'pie' || suggestion.type === 'doughnut' ? {} : {
-        x: { ticks: { font: { family: 'DM Mono', size: 10 }, color: '#8a8070' }, grid: { color: '#e8e0d0' } },
-        y: { ticks: { font: { family: 'DM Mono', size: 10 }, color: '#8a8070' }, grid: { color: '#e8e0d0' } }
-      }
-    }
-  };
-
-  currentChart = new Chart(ctx, cfg);
+  currentChart = new Chart(ctx, {
+    type: s.type,
+    data: { labels, datasets: [{ label: s.yField, data: values, backgroundColor: s.type==='line'?'rgba(212,82,42,0.12)':labels.map((_,i)=>colors[i%colors.length]), borderColor: s.type==='line'?'#d4522a':colors, borderWidth: s.type==='line'?2:1.5, fill: s.type==='line', tension: 0.4, pointBackgroundColor: '#d4522a', pointRadius: s.type==='line'?4:0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: s.type==='pie'||s.type==='doughnut', labels: { font: { family: 'DM Mono', size: 10 }, color: '#0a0a0a' } }, tooltip: { bodyFont: { family: 'DM Mono', size: 11 }, titleFont: { family: 'Syne', size: 12 } } }, scales: s.type==='pie'||s.type==='doughnut'?{}:{ x: { ticks: { font: { family: 'DM Mono', size: 10 }, color: '#8a8070' }, grid: { color: '#e8e0d0' } }, y: { ticks: { font: { family: 'DM Mono', size: 10 }, color: '#8a8070' }, grid: { color: '#e8e0d0' } } } }
+  });
 }
 
-// ---- FOLLOW-UP Q&A ----
 async function askFollowup() {
   const input = document.getElementById('followup-input');
   const q = input.value.trim();
   if (!q) return;
   input.value = '';
-
   const msgs = document.getElementById('chat-messages');
-  msgs.innerHTML += `<div class="msg user">${q}</div>`;
-  msgs.innerHTML += `<div class="msg loading-msg" id="thinking">thinking...</div>`;
+  msgs.innerHTML += `<div class="msg user">${q}</div><div class="msg loading-msg" id="thinking">thinking...</div>`;
   msgs.scrollTop = msgs.scrollHeight;
-
   chatHistory.push({ role: 'user', content: q });
-
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-allow-browser': 'true' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 500,
-        system: 'You are a data analyst assistant. Answer questions about the dataset concisely and specifically. Use actual numbers from the data. Keep answers to 2-4 sentences.',
-        messages: chatHistory
-      })
-    });
-    const data = await resp.json();
-    const answer = data.content.map(b => b.text || '').join('');
+    const answer = await callClaude(chatHistory, 'You are a data analyst. Answer questions about the dataset concisely with specific numbers. 2-4 sentences max.', 500);
     chatHistory.push({ role: 'assistant', content: answer });
-
     document.getElementById('thinking').remove();
     msgs.innerHTML += `<div class="msg assistant">${answer}</div>`;
     msgs.scrollTop = msgs.scrollHeight;
   } catch(e) {
     document.getElementById('thinking').remove();
-    msgs.innerHTML += `<div class="msg assistant">Sorry, couldn't process that question.</div>`;
+    msgs.innerHTML += `<div class="msg assistant">Sorry, could not process that question.</div>`;
   }
 }
 
 function resetAll() {
-  parsedData = null;
-  currentCSVText = '';
-  chatHistory = [];
+  parsedData = null; currentCSVText = ''; chatHistory = [];
   if (currentChart) { currentChart.destroy(); currentChart = null; }
   document.getElementById('results').style.display = 'none';
   document.getElementById('preview-section').style.display = 'none';
   document.getElementById('input-section').style.display = 'block';
   document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('error-box').style.display = 'none';
   document.querySelectorAll('.sample-btn').forEach(b => b.classList.remove('active'));
   fileInput.value = '';
 }
 
-function showError(msg) {
-  const b = document.getElementById('error-box');
-  b.textContent = msg;
-  b.style.display = 'block';
-}
+document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitKey(); });
 </script>
 </body>
 </html>
